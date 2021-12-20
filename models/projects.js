@@ -15,8 +15,8 @@ module.exports = class Project {
     );
   }
 
-  static fetchAll() {
-    return db.query("SELECT * FROM projects");
+  static fetchAll(user_id) {
+    return db.query("SELECT * FROM projects WHERE user_id = $1", [user_id]);
   }
 
   static findById(projectId) {
