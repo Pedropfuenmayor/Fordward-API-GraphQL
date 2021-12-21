@@ -23,6 +23,7 @@ module.exports = class Challenge {
         projects.name AS project_name,
         challenges.id AS challenge_id,
         challenges.name AS challenge_name,
+        challenge_type,
         challenges.is_selected AS challenge_is_selected
         FROM projects
         INNER JOIN challenges ON projects.id = challenges.project_id
@@ -37,7 +38,9 @@ module.exports = class Challenge {
     projects.id AS project_id,
     projects.name AS project_name,
     challenges.id AS challenge_id,
-    challenges.name AS challenge_name
+    challenges.name AS challenge_name,
+    challenge_type,
+    challenges.is_selected AS challenge_is_selected
     FROM projects
     INNER JOIN challenges ON projects.id = challenges.project_id
     WHERE projects.id = $1 
@@ -57,7 +60,9 @@ return db.query(
         projects.id AS project_id, 
         projects.name AS project_name,
         challenges.id AS challenge_id,
-        challenges.name AS challenge_name
+        challenges.name AS challenge_name,
+        challenge_type,
+        challenges.is_selected AS challenge_is_selected
         FROM projects
         INNER JOIN challenges ON projects.id = challenges.project_id
         WHERE projects.id = $1

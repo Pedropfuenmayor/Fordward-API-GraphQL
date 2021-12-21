@@ -75,7 +75,7 @@ module.exports = class Idea {
     );
   }
 
-  static selectideas(selectedideasIds) {
+  static selectIdeas(selectedideasIds) {
     return db.query(
       `UPDATE ideas
         SET is_selected = CASE WHEN ${selectedideasIds} THEN true
@@ -109,24 +109,13 @@ module.exports = class Idea {
     );
   }
 
-
-  static updateImpact(ideaId, ideaImpact) {
+  static updateImpactEffort(ideaId, impactEffortValue, ideaImpactEffort) {
     return db.query(
       `UPDATE ideas
-    SET impact = $1
+    SET ${ideaImpactEffort} = $1
     WHERE id = $2
     `,
-      [ideaImpact, ideaId]
-    );
-  }
-
-  static updateEffort(ideaId, ideaEffort) {
-    return db.query(
-      `UPDATE ideas
-    SET effort = $1
-    WHERE id = $2
-    `,
-      [ideaEffort, ideaId]
+      [impactEffortValue, ideaId]
     );
   }
 

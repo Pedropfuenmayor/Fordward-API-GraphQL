@@ -1,5 +1,5 @@
 
-exports.extractedChallengesIds = (challengesIds) => {
+exports.extractedIds = (challengesIds) => {
   let challengesIdsString = "";
 
   for (let i = 0; i < challengesIds.length; i++) {

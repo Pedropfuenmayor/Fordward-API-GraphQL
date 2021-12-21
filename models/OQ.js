@@ -22,8 +22,10 @@ module.exports = class OQ {
     projects.name AS project_name,
     challenges.id AS challenge_id,
     challenges.name AS challenge_name,
-    opportunity_questions.id AS opportunity_question_id,
-    opportunity_questions.name AS opportunity_question_name
+    challenge_type,
+    challenges.is_selected AS challenge_is_selected,
+    opportunity_questions.id AS oq_id,
+    opportunity_questions.name AS oq_name
     FROM projects
     INNER JOIN challenges ON projects.id = challenges.project_id
     INNER JOIN opportunity_questions ON challenges.id = opportunity_questions.challenge_id
