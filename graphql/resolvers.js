@@ -1,15 +1,72 @@
+const User = require("../models/users");
 const Project = require("../models/projects");
 const Challenge = require("../models/challenges");
 const OQ = require("../models/OQ");
 const Idea = require("../models/ideas");
 const Action = require("../models/actions");
+const bcrypt = require("bcryptjs");
 const { extractedIds } = require("../util/extractedIds");
 const validator = require("validator");
 
 module.exports = {
-  createProject: async function ({ createProjectInput }, req) {
+  createUser: async function ({ createUserInput }, req) {
+    const { user_id, email, password } = createUserInput;
+
     const errors = [];
-    if (validator.isEmpty(createProjectInput.name)) {
+    if (!validator.isEmail(email)) {
+      errors.push({ message: "E-Mail is invalid." });
+    }
+    if (
+      validator.isEmpty(password) ||
+      !validator.isLength(password, { min: 5 })
+    ) {
+      errors.push({ message: "Password too short!" });
+    }
+    if (errors.length > 0) {
+      const error = new Error("Invalid input.");
+      error.data = errors;
+      error.code = 422;
+      throw error;
+    }
+    const existingUser = await User.findByEmail(email);
+
+    if (existingUser.rowCount === 1) {
+      const error = new Error("User exists already!");
+      throw error;
+    }
+    const hashedPw = await bcrypt.hash(password, 12);
+    const user = new User(user_id, email, hashedPw);
+
+    await user.save();
+
+    return { message: "User added succesfully." };
+  },
+  users: async function (req) {
+    const { rows: users } = await User.fetchAll();
+    if (users.length === 0) {
+      const error = new Error("No users found!");
+      error.code = 404;
+      throw error;
+    }
+    return users;
+  },
+  deleteUser: async function ({ user_id }, req) {
+    const deletedUser = await User.delete(user_id);
+
+    if (deletedUser.rowCount === 1) {
+      return { message: "User deleted succesfully." };
+    } else {
+      const error = new Error("Invalid input.");
+      error.code = 422;
+      throw error;
+    }
+  },
+  createProject: async function ({ createProjectInput }, req) {
+    const { project_id, project_name, user_id } = createProjectInput;
+
+    const errors = [];
+
+    if (validator.isEmpty(project_name)) {
       errors.push({ message: "Project name must not be empty!" });
     }
     if (errors.length > 0) {
@@ -19,17 +76,17 @@ module.exports = {
       throw error;
     }
 
-    const { id, name, user_id } = createProjectInput;
-    const project = new Project(id, name, user_id);
+    const project = new Project(project_id, project_name, user_id);
 
     await project.save();
 
-    return true;
+    return { message:"Project created succesfully"};
   },
 
-  project: async function ({ id }, req) {
-    const { rows: project } = await Project.findById(id);
-    if (!project) {
+  project: async function ({ project_id }, req) {
+    const { rows: project } = await Project.findById(project_id);
+
+    if (project.length === 0) {
       const error = new Error("No project found!");
       error.code = 404;
       throw error;
@@ -41,7 +98,7 @@ module.exports = {
 
   projects: async function ({ user_id }, req) {
     const { rows: projects } = await Project.fetchAll(user_id);
-    if (!projects) {
+    if (projects.length === 0) {
       const error = new Error("No project found!");
       error.code = 404;
       throw error;
@@ -49,9 +106,9 @@ module.exports = {
     return projects;
   },
 
-  updateProject: async function ({ id, name }, req) {
+  updateProject: async function ({ project_id, project_name }, req) {
     const errors = [];
-    if (validator.isEmpty(name)) {
+    if (validator.isEmpty(project_name)) {
       errors.push({ message: "Project name must not be empty!" });
     }
     if (errors.length > 0) {
@@ -61,17 +118,19 @@ module.exports = {
       throw error;
     }
 
-    const updatedProject = await Project.update(id, name);
+    const updatedProject = await Project.update(project_id, project_name);
 
     if (updatedProject.rowCount === 1) {
-      return true;
+      return { message: "Project updated succesfully" };
     } else {
-      return false;
+      const error = new Error("Invalid input.");
+      error.code = 422;
+      throw error;
     }
   },
 
-  deleteProject: async function ({ id }, req) {
-    const deletedProject = await Project.delete(id);
+  deleteProject: async function ({ project_id }, req) {
+    const deletedProject = await Project.delete(project_id);
 
     if (deletedProject.rowCount === 1) {
       return true;
@@ -80,8 +139,10 @@ module.exports = {
     }
   },
   createChallenge: async function ({ createChallengeInput }, req) {
+    const { challenge_id, challenge_name, project_id, challenge_type } =
+      createChallengeInput;
     const errors = [];
-    if (validator.isEmpty(createChallengeInput.challenge_name)) {
+    if (validator.isEmpty(challenge_name)) {
       errors.push({ message: "Challenge name must not be empty!" });
     }
     if (errors.length > 0) {
@@ -91,8 +152,6 @@ module.exports = {
       throw error;
     }
 
-    const { challenge_id, challenge_name, project_id, challenge_type } =
-      createChallengeInput;
     const challenge = new Challenge(
       challenge_id,
       challenge_name,
@@ -106,7 +165,7 @@ module.exports = {
   },
   challenges: async function ({ project_id }, req) {
     const { rows: challenges } = await Challenge.fetchAll(project_id);
-    if (!challenges) {
+    if (challenges.length === 0) {
       const error = new Error("No challenge found!");
       error.code = 404;
       throw error;
@@ -119,7 +178,7 @@ module.exports = {
       project_id,
       challenge_id
     );
-    if (!challenge) {
+    if (challenge.length === 0) {
       const error = new Error("No challenge found!");
       error.code = 404;
       throw error;
@@ -140,7 +199,7 @@ module.exports = {
   },
   chosenChallenges: async function ({ project_id }, req) {
     const { rows: challenges } = await Challenge.chosenChallenges(project_id);
-    if (!challenges) {
+    if (challenges.length === 0) {
       const error = new Error("No challenge found!");
       error.code = 404;
       throw error;
@@ -260,7 +319,7 @@ module.exports = {
   },
   ideas: async function ({ project_id, challenge_id }, req) {
     const { rows: ideas } = await Idea.fetchAll(project_id, challenge_id);
-    if (!ideas) {
+    if (ideas.length === 0) {
       const error = new Error("No ideas found!");
       error.code = 404;
       throw error;
@@ -274,7 +333,7 @@ module.exports = {
       challenge_id,
       idea_id
     );
-    if (!idea) {
+    if (idea.length === 0) {
       const error = new Error("No idea found!");
       error.code = 404;
       throw error;
@@ -295,7 +354,7 @@ module.exports = {
   },
   chosenIdeas: async function ({ project_id, challenge_id }, req) {
     const { rows: ideas } = await Idea.chosenIdeas(project_id, challenge_id);
-    if (!ideas) {
+    if (ideas.length === 0) {
       const error = new Error("No ideas found!");
       error.code = 404;
       throw error;
@@ -376,7 +435,7 @@ module.exports = {
   },
   actions: async function ({ user_id }, req) {
     const { rows: actions } = await Action.fetchAll(user_id);
-    if (!actions) {
+    if (actions.length === 0) {
       const error = new Error("No Actions found!");
       error.code = 404;
       throw error;
@@ -390,7 +449,7 @@ module.exports = {
       challenge_id,
       idea_id
     );
-    if (!action) {
+    if (action.length === 0) {
       const error = new Error("No action found!");
       error.code = 404;
       throw error;
@@ -402,11 +461,11 @@ module.exports = {
 
   updateAction: async function ({ updateActionInput }, req) {
     const {
+      action_id,
       action_what,
       action_due_date,
       action_test_until,
       action_succes_criteria,
-      idea_id,
     } = updateActionInput;
 
     const updatedAction = await Action.update(
@@ -414,20 +473,20 @@ module.exports = {
       action_due_date,
       action_test_until,
       action_succes_criteria,
-      idea_id
+      action_id
     );
 
-    if (updatedAction .rowCount === 1) {
+    if (updatedAction.rowCount === 1) {
       return true;
     } else {
       return false;
     }
   },
 
-  deleteIdea: async function ({ idea_id }, req) {
-    const updatedIdea = await Idea.delete(idea_id);
+  deleteAction: async function ({ action_id }, req) {
+    const deletedAction = await Action.delete(action_id);
 
-    if (updatedIdea.rowCount === 1) {
+    if (deletedAction.rowCount === 1) {
       return true;
     } else {
       return false;

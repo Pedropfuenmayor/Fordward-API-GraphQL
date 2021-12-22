@@ -81,17 +81,17 @@ module.exports = class Action {
     );
   }
 
-  static update(what, dueDate, testUntil, succesCriteria, ideaId) {
+  static update(what, dueDate, testUntil, succesCriteria, actionId) {
     return db.query(
       `UPDATE actions
     SET what = $1, due_date = $2, test_until = $3, succes_criteria = $4
     WHERE id = $5
     `,
-      [what, dueDate, testUntil, succesCriteria, ideaId]
+      [what, dueDate, testUntil, succesCriteria, actionId]
     );
   }
 
-  static delete(ideaId) {
-    return db.query("DELETE FROM actions WHERE idea_id = $1", [ideaId]);
+  static delete(actionId) {
+    return db.query("DELETE FROM actions WHERE id = $1", [actionId]);
   }
 };

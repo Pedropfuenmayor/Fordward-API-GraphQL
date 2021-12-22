@@ -2,14 +2,14 @@ const { buildSchema } = require('graphql');
 
 module.exports = buildSchema(`
 type User {
-    id: ID!
+    user_id: ID!
     email: String!
     password: String
 }
 
 type Project{
-    id: ID!
-    name: String!
+    project_id: ID!
+    project_name: String!
     user_id: ID!
 }
 
@@ -70,9 +70,19 @@ type Action{
     challenge_is_selected: Boolean
 }
 
+type Message{
+    message: String!
+}
+
+input CreateUserInputData {
+    user_id: ID!
+    email: String!
+    password: String
+}
+
 input CreateProjectInputData {
-    id: ID!
-    name: String!
+    project_id: ID!
+    project_name: String!
     user_id: ID!
 }
 
@@ -98,11 +108,12 @@ input UpdateActionInputData {
     action_due_date: String!
     action_test_until: String!
     action_succes_criteria: String!
-    idea_id:ID!
+    action_id:ID!
 }
 
 type RootQuery {
-    project(id: ID!): Project!
+    users:[User!]!
+    project(project_id: ID!): Project!
     projects(user_id: ID!): [Project!]!
     challenges(project_id: ID!): [Challenge!]!
     challenge(project_id: ID!, challenge_id: ID! ): Challenge!
@@ -117,8 +128,8 @@ type RootQuery {
 
 type RootMutation {
     createProject(createProjectInput: CreateProjectInputData): Boolean!
-    updateProject(id:ID!, name: String!): Boolean!
-    deleteProject(id:ID!): Boolean!
+    updateProject(project_id:ID!, project_name: String!): Boolean!
+    deleteProject(project_id:ID!): Boolean!
     createChallenge(createChallengeInput: CreateChallengeInputData): Boolean!
     selectChallenges(selectedIds: [Int!]!): Boolean!
     updateChallenge(challenge_id:ID!, challenge_name: String!): Boolean!
@@ -134,6 +145,8 @@ type RootMutation {
     createAction(createActionInput:CreateActionInputData): Boolean!
     updateAction(updateActionInput:UpdateActionInputData): Boolean!
     deleteAction(action_id:ID!): Boolean!
+    createUser(createUserInput: CreateUserInputData): Message!
+    deleteUser(user_id:ID!): Message!
 }
 
 schema {

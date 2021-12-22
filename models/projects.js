@@ -16,11 +16,19 @@ module.exports = class Project {
   }
 
   static fetchAll(user_id) {
-    return db.query("SELECT * FROM projects WHERE user_id = $1", [user_id]);
+    return db.query(`SELECT 
+    id AS project_id,
+    name AS project_name,
+    user_id 
+    FROM projects WHERE user_id = $1`, [user_id]);
   }
 
   static findById(projectId) {
-    return db.query("SELECT * FROM projects WHERE id = $1", [projectId]);
+    return db.query(`SELECT 
+    id AS project_id,
+    name AS project_name,
+    user_id 
+    FROM projects WHERE id = $1`, [projectId]);
   }
 
   static update(projectId, projectName) {
