@@ -127,24 +127,24 @@ type RootQuery {
 }
 
 type RootMutation {
-    createProject(createProjectInput: CreateProjectInputData): Boolean!
-    updateProject(project_id:ID!, project_name: String!): Boolean!
-    deleteProject(project_id:ID!): Boolean!
-    createChallenge(createChallengeInput: CreateChallengeInputData): Boolean!
-    selectChallenges(selectedIds: [Int!]!): Boolean!
-    updateChallenge(challenge_id:ID!, challenge_name: String!): Boolean!
-    deleteChallenge(challenge_id:ID!): Boolean!
-    createOQ(challenge_id:ID!, oq_id:ID!, oq_name: String!): Boolean!
-    updateOQ(oq_id:ID!, oq_name: String!): Boolean!
-    deleteOQ(oq_id:ID!): Boolean!
-    createIdea(idea_id:ID!, idea_name:String!, challenge_id:ID!): Boolean!
-    selectIdeas(selectedIds: [Int!]!): Boolean!
-    updateIdea(idea_id:ID!, idea_name: String!): Boolean!
-    updateIdeaImpactEffort(idea_id:ID!, idea_impact_effort: String!, impact_effort_value:Boolean!): Boolean!
-    deleteIdea(idea_id:ID!): Boolean!
-    createAction(createActionInput:CreateActionInputData): Boolean!
-    updateAction(updateActionInput:UpdateActionInputData): Boolean!
-    deleteAction(action_id:ID!): Boolean!
+    createProject(createProjectInput: CreateProjectInputData): Message!
+    updateProject(project_id:ID!, project_name: String!): Message!
+    deleteProject(project_id:ID!): Message!
+    createChallenge(createChallengeInput: CreateChallengeInputData): Message!
+    selectChallenges(selectedIds: [Int!]!, project_id:ID!): Message!
+    updateChallenge(challenge_id:ID!, challenge_name: String!): Message!
+    deleteChallenge(challenge_id:ID!): Message!
+    createOQ(challenge_id:ID!, oq_id:ID!, oq_name: String!): Message!
+    updateOQ(oq_id:ID!, oq_name: String!): Message!
+    deleteOQ(oq_id:ID!): Message!
+    createIdea(idea_id:ID!, idea_name:String!, challenge_id:ID!): Message!
+    selectIdeas(selectedIds: [Int!]!, challenge_id:ID!): Message!
+    updateIdea(idea_id:ID!, idea_name: String!): Message!
+    updateIdeaImpactEffort(idea_id:ID!, idea_impact_effort: String!, impact_effort_value:Boolean!): Message!
+    deleteIdea(idea_id:ID!): Message!
+    createAction(createActionInput:CreateActionInputData): Message!
+    updateAction(updateActionInput:UpdateActionInputData): Message!
+    deleteAction(action_id:ID!): Message!
     createUser(createUserInput: CreateUserInputData): Message!
     deleteUser(user_id:ID!): Message!
 }

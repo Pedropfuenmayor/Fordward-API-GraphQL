@@ -14,7 +14,7 @@ module.exports = {
 
     const errors = [];
     if (!validator.isEmail(email)) {
-      errors.push({ message: "E-Mail is invalid." });
+      errors.push({ message: "E-Mail is invalid!" });
     }
     if (
       validator.isEmpty(password) ||
@@ -23,7 +23,7 @@ module.exports = {
       errors.push({ message: "Password too short!" });
     }
     if (errors.length > 0) {
-      const error = new Error("Invalid input.");
+      const error = new Error("Invalid input!");
       error.data = errors;
       error.code = 422;
       throw error;
@@ -37,7 +37,7 @@ module.exports = {
     const hashedPw = await bcrypt.hash(password, 12);
     const user = new User(user_id, email, hashedPw);
 
-    await user.save();
+    const savedUser = await user.save();
 
     return { message: "User added succesfully." };
   },
@@ -56,7 +56,7 @@ module.exports = {
     if (deletedUser.rowCount === 1) {
       return { message: "User deleted succesfully." };
     } else {
-      const error = new Error("Invalid input.");
+      const error = new Error("Invalid input!");
       error.code = 422;
       throw error;
     }
@@ -66,11 +66,11 @@ module.exports = {
 
     const errors = [];
 
-    if (validator.isEmpty(project_name)) {
+    if (validator.isEmpty(project_name.trim())) {
       errors.push({ message: "Project name must not be empty!" });
     }
     if (errors.length > 0) {
-      const error = new Error("Invalid input.");
+      const error = new Error("Invalid input!");
       error.data = errors;
       error.code = 422;
       throw error;
@@ -78,9 +78,9 @@ module.exports = {
 
     const project = new Project(project_id, project_name, user_id);
 
-    await project.save();
+    const savedProject = await project.save();
 
-    return { message:"Project created succesfully"};
+    return { message: "Project created succesfully." };
   },
 
   project: async function ({ project_id }, req) {
@@ -108,11 +108,11 @@ module.exports = {
 
   updateProject: async function ({ project_id, project_name }, req) {
     const errors = [];
-    if (validator.isEmpty(project_name)) {
+    if (validator.isEmpty(project_name.trim())) {
       errors.push({ message: "Project name must not be empty!" });
     }
     if (errors.length > 0) {
-      const error = new Error("Invalid input.");
+      const error = new Error("Invalid input!");
       error.data = errors;
       error.code = 422;
       throw error;
@@ -121,9 +121,9 @@ module.exports = {
     const updatedProject = await Project.update(project_id, project_name);
 
     if (updatedProject.rowCount === 1) {
-      return { message: "Project updated succesfully" };
+      return { message: "Project updated succesfully." };
     } else {
-      const error = new Error("Invalid input.");
+      const error = new Error("Invalid input!");
       error.code = 422;
       throw error;
     }
@@ -133,20 +133,22 @@ module.exports = {
     const deletedProject = await Project.delete(project_id);
 
     if (deletedProject.rowCount === 1) {
-      return true;
+      return { message: "Project deleted succesfully." };
     } else {
-      return false;
+      const error = new Error("Invalid input!");
+      error.code = 422;
+      throw error;
     }
   },
   createChallenge: async function ({ createChallengeInput }, req) {
     const { challenge_id, challenge_name, project_id, challenge_type } =
       createChallengeInput;
     const errors = [];
-    if (validator.isEmpty(challenge_name)) {
+    if (validator.isEmpty(challenge_name.trim())) {
       errors.push({ message: "Challenge name must not be empty!" });
     }
     if (errors.length > 0) {
-      const error = new Error("Invalid input.");
+      const error = new Error("Invalid input!");
       error.data = errors;
       error.code = 422;
       throw error;
@@ -159,9 +161,9 @@ module.exports = {
       challenge_type
     );
 
-    await challenge.save();
+    const createdChallenge = await challenge.save();
 
-    return true;
+    return { message: "Challenge created succesfully." };
   },
   challenges: async function ({ project_id }, req) {
     const { rows: challenges } = await Challenge.fetchAll(project_id);
@@ -188,13 +190,19 @@ module.exports = {
     };
   },
 
-  selectChallenges: async function ({ selectedIds }, req) {
+  selectChallenges: async function ({ selectedIds, project_id }, req) {
     const receivedIds = extractedIds(selectedIds);
-    const updatedChallenges = await Challenge.selectChallenges(receivedIds);
+    const updatedChallenges = await Challenge.selectChallenges(
+      receivedIds,
+      project_id
+    );
+    // refactor to handle error properly
     if (updatedChallenges.rowCount > 0) {
-      return true;
+      return { message: "Challenges selected succesfully." };
     } else {
-      return false;
+      const error = new Error("Invalid input!");
+      error.code = 422;
+      throw error;
     }
   },
   chosenChallenges: async function ({ project_id }, req) {
@@ -210,11 +218,11 @@ module.exports = {
 
   updateChallenge: async function ({ challenge_id, challenge_name }, req) {
     const errors = [];
-    if (validator.isEmpty(challenge_name)) {
+    if (validator.isEmpty(challenge_name.trim())) {
       errors.push({ message: "Challenge name must not be empty!" });
     }
     if (errors.length > 0) {
-      const error = new Error("Invalid input.");
+      const error = new Error("Invalid input!");
       error.data = errors;
       error.code = 422;
       throw error;
@@ -226,9 +234,11 @@ module.exports = {
     );
 
     if (updatedChallenge.rowCount === 1) {
-      return true;
+      return { message: "Challenge update succesfully." };
     } else {
-      return false;
+      const error = new Error("Invalid input!");
+      error.code = 422;
+      throw error;
     }
   },
 
@@ -236,18 +246,20 @@ module.exports = {
     const updatedChallenge = await Challenge.delete(challenge_id);
 
     if (updatedChallenge.rowCount === 1) {
-      return true;
+      return { message: "Challenge deleted succesfully." };
     } else {
-      return false;
+      const error = new Error("Invalid input!");
+      error.code = 422;
+      throw error;
     }
   },
   createOQ: async function ({ challenge_id, oq_id, oq_name }, req) {
     const errors = [];
-    if (validator.isEmpty(oq_name)) {
+    if (validator.isEmpty(oq_name.trim())) {
       errors.push({ message: "OQ name must not be empty!" });
     }
     if (errors.length > 0) {
-      const error = new Error("Invalid input.");
+      const error = new Error("Invalid input!");
       error.data = errors;
       error.code = 422;
       throw error;
@@ -255,14 +267,14 @@ module.exports = {
 
     const oq = new OQ(oq_id, oq_name, challenge_id);
 
-    await oq.save();
+    const createdOQ = await oq.save();
 
-    return true;
+    return { message: "OQ created succesfully." };
   },
   oq: async function ({ project_id, challenge_id }, req) {
     const { rows: oq } = await OQ.fetchOQ(project_id, challenge_id);
     if (!oq) {
-      const error = new Error("No oq found!");
+      const error = new Error("No OQ found!");
       error.code = 404;
       throw error;
     }
@@ -272,11 +284,11 @@ module.exports = {
   },
   updateOQ: async function ({ oq_id, oq_name }, req) {
     const errors = [];
-    if (validator.isEmpty(oq_name)) {
+    if (validator.isEmpty(oq_name.trim())) {
       errors.push({ message: "OQ name must not be empty!" });
     }
     if (errors.length > 0) {
-      const error = new Error("Invalid input.");
+      const error = new Error("Invalid input!");
       error.data = errors;
       error.code = 422;
       throw error;
@@ -285,27 +297,31 @@ module.exports = {
     const updatedOQ = await OQ.update(oq_id, oq_name);
 
     if (updatedOQ.rowCount === 1) {
-      return true;
+      return { message: "OQ updated succesfully." };
     } else {
-      return false;
+      const error = new Error("Invalid input!");
+      error.code = 422;
+      throw error;
     }
   },
   deleteOQ: async function ({ oq_id }, req) {
     const updatedOQ = await OQ.delete(oq_id);
 
     if (updatedOQ.rowCount === 1) {
-      return true;
+      return { message: "OQ deleted succesfully." };
     } else {
-      return false;
+      const error = new Error("Invalid input!");
+      error.code = 422;
+      throw error;
     }
   },
   createIdea: async function ({ challenge_id, idea_id, idea_name }, req) {
     const errors = [];
-    if (validator.isEmpty(idea_name)) {
+    if (validator.isEmpty(idea_name.trim())) {
       errors.push({ message: "Idea name must not be empty!" });
     }
     if (errors.length > 0) {
-      const error = new Error("Invalid input.");
+      const error = new Error("Invalid input!");
       error.data = errors;
       error.code = 422;
       throw error;
@@ -313,9 +329,9 @@ module.exports = {
 
     const idea = new Idea(idea_id, idea_name, challenge_id);
 
-    await idea.save();
+    const createdIdea = await idea.save();
 
-    return true;
+    return { message: "Idea created succesfully." };
   },
   ideas: async function ({ project_id, challenge_id }, req) {
     const { rows: ideas } = await Idea.fetchAll(project_id, challenge_id);
@@ -343,13 +359,16 @@ module.exports = {
     };
   },
 
-  selectIdeas: async function ({ selectedIds }, req) {
+  selectIdeas: async function ({ selectedIds, challenge_id }, req) {
     const receivedIds = extractedIds(selectedIds);
-    const updatedChallenges = await Idea.selectIdeas(receivedIds);
+    // refactor to handle error properly
+    const updatedChallenges = await Idea.selectIdeas(receivedIds, challenge_id);
     if (updatedChallenges.rowCount > 0) {
-      return true;
+      return { message: "Ideas selected succesfully." };
     } else {
-      return false;
+      const error = new Error("Invalid input!");
+      error.code = 422;
+      throw error;
     }
   },
   chosenIdeas: async function ({ project_id, challenge_id }, req) {
@@ -366,7 +385,7 @@ module.exports = {
   updateIdea: async function ({ idea_id, idea_name }, req) {
     const errors = [];
 
-    if (validator.isEmpty(idea_name)) {
+    if (validator.isEmpty(idea_name.trim())) {
       errors.push({ message: "Idea name must not be empty!" });
     }
     if (errors.length > 0) {
@@ -379,9 +398,11 @@ module.exports = {
     const updatedIdea = await Idea.update(idea_id, idea_name);
 
     if (updatedIdea.rowCount === 1) {
-      return true;
+      return { message: "Idea updated succesfully." };
     } else {
-      return false;
+      const error = new Error("Invalid input!");
+      error.code = 422;
+      throw error;
     }
   },
 
@@ -396,9 +417,11 @@ module.exports = {
     );
 
     if (updatedIdea.rowCount === 1) {
-      return true;
+      return { message: "Idea updated succesfully." };
     } else {
-      return false;
+      const error = new Error("Invalid input!");
+      error.code = 422;
+      throw error;
     }
   },
 
@@ -406,9 +429,11 @@ module.exports = {
     const updatedIdea = await Idea.delete(idea_id);
 
     if (updatedIdea.rowCount === 1) {
-      return true;
+      return { message: "Idea deleted succesfully." };
     } else {
-      return false;
+      const error = new Error("Invalid input!");
+      error.code = 422;
+      throw error;
     }
   },
   createAction: async function ({ createActionInput }, req) {
@@ -420,6 +445,27 @@ module.exports = {
       action_succes_criteria,
       idea_id,
     } = createActionInput;
+
+    const errors = [];
+    if (validator.isEmpty(action_what.trim())) {
+      errors.push({ message: "Action 'What need to be donde..' must not be empty!" });
+    }
+    if (!validator.isAfter(action_due_date)) {
+      errors.push({ message: "Action due date must be later than today!" });
+    }
+    if (!validator.isAfter(action_test_until,action_due_date)) {
+      errors.push({ message: "Action test date must be later than due date!" });
+    }
+    if (validator.isEmpty(action_succes_criteria.trim()) ) {
+      errors.push({ message: "Action 'Succes criteria' must not be empty!" });
+    }
+    if (errors.length > 0) {
+      const error = new Error("Invalid input!");
+      error.data = errors;
+      error.code = 422;
+      throw error;
+    }
+
     const action = new Action(
       action_id,
       action_what,
@@ -429,9 +475,9 @@ module.exports = {
       idea_id
     );
 
-    await action.save();
+    const createdAction = await action.save();
 
-    return true;
+    return { message: "Action created succesfully." };
   },
   actions: async function ({ user_id }, req) {
     const { rows: actions } = await Action.fetchAll(user_id);
@@ -468,6 +514,27 @@ module.exports = {
       action_succes_criteria,
     } = updateActionInput;
 
+
+    const errors = [];
+    if (validator.isEmpty(action_what.trim())) {
+      errors.push({ message: "Action 'What need to be donde..' must not be empty!" });
+    }
+    if (!validator.isAfter(action_due_date)) {
+      errors.push({ message: "Action due date must be later than today!" });
+    }
+    if (!validator.isAfter(action_test_until,action_due_date)) {
+      errors.push({ message: "Action test date must be later than due date!" });
+    }
+    if (validator.isEmpty(action_succes_criteria.trim()) ) {
+      errors.push({ message: "Action 'Succes criteria' must not be empty!" });
+    }
+    if (errors.length > 0) {
+      const error = new Error("Invalid input!");
+      error.data = errors;
+      error.code = 422;
+      throw error;
+    }
+
     const updatedAction = await Action.update(
       action_what,
       action_due_date,
@@ -477,9 +544,11 @@ module.exports = {
     );
 
     if (updatedAction.rowCount === 1) {
-      return true;
+      return { message: "Action updated succesfully." };
     } else {
-      return false;
+      const error = new Error("Invalid input!");
+      error.code = 422;
+      throw error;
     }
   },
 
@@ -487,9 +556,11 @@ module.exports = {
     const deletedAction = await Action.delete(action_id);
 
     if (deletedAction.rowCount === 1) {
-      return true;
+      return { message: "Action deleted succesfully." };
     } else {
-      return false;
+      const error = new Error("Invalid input!");
+      error.code = 422;
+      throw error;
     }
   },
 };

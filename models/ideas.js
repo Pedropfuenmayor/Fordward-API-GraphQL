@@ -74,12 +74,12 @@ module.exports = class Idea {
       [ideaName, ideaId]
     );
   }
-
-  static selectIdeas(selectedideasIds) {
+//refactor to prevent unwanted injections
+  static selectIdeas(selectedideasIds, challenge_id) {
     return db.query(
       `UPDATE ideas
-        SET is_selected = CASE WHEN ${selectedideasIds} THEN true
-                      ELSE false END`
+        SET is_selected = CASE WHEN ${selectedideasIds} AND challenge_id = $1 THEN true
+                      ELSE false END`, [challenge_id]
     );
   }
 

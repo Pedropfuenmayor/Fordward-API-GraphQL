@@ -47,11 +47,12 @@ module.exports = class Challenge {
     AND challenges.id = $2`, [projectId, challengeId]);
   }
 
-  static selectChallenges(selectedChallengesIds){
+// refactor to prevent unwanted injections
+  static selectChallenges(selectedChallengesIds, project_id){
 return db.query(
     `UPDATE challenges
-    SET is_selected = CASE WHEN ${selectedChallengesIds} THEN true
-                  ELSE false END`)
+    SET is_selected = CASE WHEN ${selectedChallengesIds} AND (project_id = $1) THEN true
+                  ELSE false END`,[project_id])
   }
 
   static chosenChallenges (projectId){

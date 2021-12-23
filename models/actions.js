@@ -39,10 +39,10 @@ module.exports = class Action {
       actions.test_until AS action_test_until,
       actions.succes_criteria AS action_succes_criteria
       FROM projects
-      INNER JOIN challenges ON projects.id = challenges.project_id
-      INNER JOIN opportunity_questions ON challenges.id = opportunity_questions.challenge_id
-      INNER JOIN ideas ON challenges.id = ideas.challenge_id
-      INNER JOIN actions ON ideas.id = actions.idea_id
+      CROSS JOIN challenges
+      CROSS JOIN opportunity_questions
+      CROSS JOIN ideas
+      CROSS JOIN actions
       WHERE projects.user_id = $1
       `,
       [userId]
