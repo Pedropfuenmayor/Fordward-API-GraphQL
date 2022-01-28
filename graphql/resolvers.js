@@ -13,15 +13,6 @@ module.exports = {
       }
       return projects;
     },
-    oq: async function (_, { project_id, challenge_id }) {
-      const { rows: oq } = await OQ.fetchOQ(project_id, challenge_id);
-      if (!oq) {
-        const error = new Error("No OQ found!");
-        error.code = 404;
-        throw error;
-      }
-      return oq[0];
-    },
   },
   Project: {
     challenges: async function ({ project_id }, args, context) {
