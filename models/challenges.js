@@ -16,7 +16,7 @@ module.exports = class Challenge {
     );
   }
 
-  static fetchAll(projectId) {
+  static fetchAll(projectIds) {
     return db.query(
         `SELECT 
         projects.id AS project_id, 
@@ -27,8 +27,8 @@ module.exports = class Challenge {
         challenges.is_selected AS challenge_is_selected
         FROM projects
         INNER JOIN challenges ON projects.id = challenges.project_id
-        WHERE projects.id = $1`,
-        [projectId]
+        WHERE projects.id = ANY ($1)`,
+        [projectIds]
         );
   }
 

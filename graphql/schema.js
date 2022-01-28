@@ -1,6 +1,7 @@
-const { buildSchema } = require('graphql');
+const {  makeExecutableSchema  } = require('@graphql-tools/schema');
+const resolvers = require('../graphql/resolvers');
 
-module.exports = buildSchema(`
+const typeDefs =`
 type User {
     user_id: ID!
     email: String!
@@ -11,6 +12,7 @@ type Project{
     project_id: ID!
     project_name: String!
     user_id: ID!
+    challenges: [Challenge]
 }
 
 type Challenge{
@@ -20,16 +22,18 @@ type Challenge{
     project_id: ID!
     challenge_type: String!
     challenge_is_selected: Boolean
+    OQ: OQ
+    ideas: [Idea]
 }
 
 type OQ{
-    oq_id:ID!
-    oq_name: ID!
-    challenge_id: ID!
-    challenge_name: String!
-    project_name: String!
-    project_id: ID!
-    challenge_type: String!
+    oq_id:ID
+    oq_name: ID
+    challenge_id: ID
+    challenge_name: String
+    project_name: String
+    project_id: ID
+    challenge_type: String
     challenge_is_selected: Boolean
 }
 
@@ -47,26 +51,27 @@ type Idea{
     project_id: ID!
     challenge_type: String!
     challenge_is_selected: Boolean
+    action: Action
 }
 
 type Action{
-    action_id:ID!
-    action_what:String!
-    action_due_date: String!
-    action_test_until: String!
-    action_succes_criteria: String!
-    idea_id:ID!
-    idea_name: String!
+    action_id:ID
+    action_what:String
+    action_due_date: String
+    action_test_until: String
+    action_succes_criteria: String
+    idea_id:ID
+    idea_name: String
     idea_effort: Boolean
     idea_impact: Boolean
-    oq_id:ID!
-    oq_name: ID!
+    oq_id:ID
+    oq_name: ID
     idea_is_selected: Boolean
-    challenge_id: ID!
-    challenge_name: String!
-    project_name: String!
-    project_id: ID!
-    challenge_type: String!
+    challenge_id: ID
+    challenge_name: String
+    project_name: String
+    project_id: ID
+    challenge_type: String
     challenge_is_selected: Boolean
 }
 
@@ -111,7 +116,7 @@ input UpdateActionInputData {
     action_id:ID!
 }
 
-type RootQuery {
+type Query {
     users:[User!]!
     project(project_id: ID!): Project!
     projects(user_id: ID!): [Project!]!
@@ -126,7 +131,7 @@ type RootQuery {
     actions(user_id:ID!):[Action!]!
 }
 
-type RootMutation {
+type Mutation {
     createProject(createProjectInput: CreateProjectInputData): Message!
     updateProject(project_id:ID!, project_name: String!): Message!
     deleteProject(project_id:ID!): Message!
@@ -149,8 +154,10 @@ type RootMutation {
     deleteUser(user_id:ID!): Message!
 }
 
-schema {
-    query: RootQuery
-    mutation: RootMutation
-}
-`)
+`
+
+module.exports = makeExecutableSchema({
+    typeDefs,
+    resolvers,
+});
+

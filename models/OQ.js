@@ -35,6 +35,25 @@ module.exports = class OQ {
         );
   }
 
+  static fetchAllOQ(challengeId) {
+    return db.query(`
+    SELECT 
+    projects.id AS project_id, 
+    projects.name AS project_name,
+    challenges.id AS challenge_id,
+    challenges.name AS challenge_name,
+    challenge_type,
+    challenges.is_selected AS challenge_is_selected,
+    opportunity_questions.id AS oq_id,
+    opportunity_questions.name AS oq_name
+    FROM projects
+    INNER JOIN challenges ON projects.id = challenges.project_id
+    INNER JOIN opportunity_questions ON challenges.id = opportunity_questions.challenge_id
+    WHERE challenges.id = ANY ($1)`,
+        [challengeId]
+        );
+  }
+
 
   static update(oqId, oqName) {
     return db.query(`UPDATE opportunity_questions

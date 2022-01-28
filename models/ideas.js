@@ -39,6 +39,29 @@ module.exports = class Idea {
     );
   }
 
+  static fetchAllIdeas(challengeId) {
+    return db.query(
+      `SELECT 
+    projects.id AS project_id, 
+    projects.name AS project_name,
+    challenges.id AS challenge_id,
+    challenges.name AS challenge_name,
+    opportunity_questions.id AS opportunity_question_id,
+    opportunity_questions.name AS opportunity_question_name,
+    ideas.id AS idea_id,
+    ideas.name AS idea_name,
+    ideas.is_selected AS idea_is_selected,
+    ideas.impact AS idea_impact,
+    ideas.effort AS idea_effort
+    FROM projects
+    INNER JOIN challenges ON projects.id = challenges.project_id
+    INNER JOIN opportunity_questions ON challenges.id = opportunity_questions.challenge_id
+    JOIN ideas ON challenges.id = ideas.challenge_id
+    WHERE challenges.id = ANY ($1)`,
+      [challengeId]
+    );
+  }
+
   static findById(projectId, challengeId, ideaId) {
     return db.query(
       `SELECT 

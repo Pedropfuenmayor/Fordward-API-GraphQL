@@ -3,8 +3,9 @@ const bodyParser = require("body-parser");
 const app = express();
 const port = 3000;
 const { graphqlHTTP } = require('express-graphql');
-const graphqlSchema = require('./graphql/schema');
-const graphqlResolver = require('./graphql/resolvers');
+const schema = require('./graphql/schema');
+const loaders = require('./util/context')
+
 
 
 app.use(bodyParser.json());
@@ -25,9 +26,10 @@ app.use((req, res, next) => {
 app.use(
   '/graphql',
   graphqlHTTP({
-    schema: graphqlSchema,
-    rootValue: graphqlResolver,
+    schema,
     graphiql: true,
+    context: loaders(),
+
     customFormatErrorFn(err) {
       if (!err.originalError) {
         return err;

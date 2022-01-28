@@ -49,6 +49,36 @@ module.exports = class Action {
     );
   }
 
+  static fetchAllActions(ideasIds) {
+    return db.query(
+      `SELECT 
+      projects.id AS project_id, 
+      projects.name AS project_name,
+      challenges.id AS challenge_id,
+      challenges.name AS challenge_name,
+      opportunity_questions.id AS opportunity_question_id,
+      opportunity_questions.name AS opportunity_question_name,
+      ideas.id AS idea_id,
+      ideas.name AS idea_name,
+      ideas.is_selected AS idea_is_selected,
+      ideas.impact AS idea_impact,
+      ideas.effort AS idea_effort,
+      actions.id AS action_id,
+      actions.what AS action_what,
+      actions.due_date AS action_due_date,
+      actions.test_until AS action_test_until,
+      actions.succes_criteria AS action_succes_criteria
+      FROM projects
+      CROSS JOIN challenges
+      CROSS JOIN opportunity_questions
+      CROSS JOIN ideas
+      CROSS JOIN actions
+      WHERE ideas.id = ANY ($1)
+      `,
+      [ideasIds]
+    );
+  }
+
   static findById(projectId, challengeId, ideaId) {
     return db.query(
       `SELECT 
