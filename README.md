@@ -4,7 +4,6 @@ This is a back-end service for the Forward project as an alternative to the curr
 
 Optimize database calls via batching and caching using Data loader as part of the application data fetching layer.
 
----
 ## ⚙️ Tech stack
 
 Node.js | Express.js | SQL | PostgreSQL | GraphQL | Express GraphQL server | Data loader
