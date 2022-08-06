@@ -6,7 +6,7 @@ Optimize database calls via batching and caching using Data loader as part of th
 
 ## ⚙️ Tech stack
 
-Node.js | Express.js | SQL | PostgreSQL | GraphQL | Express GraphQL server | Data loader
+Node.js | Express.js | SQL | PostgreSQL | GraphQL | Express GraphQL server 
 
 Project page [https://forward-next-project.vercel.app/](https://forward-next-project.vercel.app/)
 
